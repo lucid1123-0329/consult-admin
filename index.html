@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>명불허전학원 — 상담 관리 포털</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─── CSS 변수 ─── */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-hover: #fafbfc;
+  --border: #e2e5ea;
+  --border-light: #eef0f3;
+  --text: #1a1d23;
+  --text-secondary: #5f6775;
+  --text-muted: #9ba2ae;
+  --primary: #2563eb;
+  --primary-light: #eff4ff;
+  --primary-dark: #1d4ed8;
+  --accent-green: #059669;
+  --accent-green-bg: #ecfdf5;
+  --accent-orange: #d97706;
+  --accent-orange-bg: #fffbeb;
+  --accent-red: #dc2626;
+  --accent-red-bg: #fef2f2;
+  --accent-purple: #7c3aed;
+  --accent-purple-bg: #f5f3ff;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.04);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.08);
+  --font-sans: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Noto Sans KR', sans-serif;
+  --sidebar-w: 240px;
+  --header-h: 60px;
+  --transition: 0.2s ease;
+}
+
+/* ─── 리셋 ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+input, button, select, textarea { font-family: inherit; }
+button { cursor: pointer; border: none; background: none; }
+
+/* ─── 로그인 화면 ─── */
+.login-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  position: relative;
+  overflow: hidden;
+}
+.login-wrap::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -30%;
+  width: 80%;
+  height: 200%;
+  background: radial-gradient(ellipse, rgba(37,99,235,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.login-card {
+  background: rgba(255,255,255,.97);
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  position: relative;
+  z-index: 1;
+}
+.login-card .logo-area {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.login-card .logo-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--primary), #6366f1);
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+  color: #fff;
+}
+.login-card h1 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.02em;
+}
+.login-card .subtitle {
+  color: var(--text-secondary);
+  font-size: .88rem;
+  margin-top: 4px;
+}
+.login-field {
+  margin-bottom: 16px;
+}
+.login-field label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.login-field input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: .95rem;
+  transition: border-color var(--transition);
+  background: var(--bg);
+}
+.login-field input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+  background: #fff;
+}
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--primary), #4f46e5);
+  color: #fff;
+  font-size: .95rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  margin-top: 8px;
+  transition: all var(--transition);
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(37,99,235,.35); }
+.login-btn:active { transform: translateY(0); }
+.login-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.login-error {
+  background: var(--accent-red-bg);
+  color: var(--accent-red);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: .85rem;
+  margin-bottom: 16px;
+  display: none;
+}
+
+/* ─── 레이아웃 ─── */
+.app { display: none; min-height: 100vh; }
+.app.active { display: flex; }
+.login-wrap.active { display: flex; }
+
+/* 사이드바 */
+.sidebar {
+  width: var(--sidebar-w);
+  background: #0f172a;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  transition: transform .3s ease;
+}
+.sidebar-brand {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sidebar-brand h2 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.01em;
+}
+.sidebar-brand span {
+  font-size: .75rem;
+  color: #94a3b8;
+  display: block;
+  margin-top: 2px;
+}
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+.nav-section-label {
+  font-size: .7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #64748b;
+  padding: 12px 10px 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: .88rem;
+  font-weight: 400;
+  color: #cbd5e1;
+  transition: all var(--transition);
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+.nav-item.active { background: rgba(37,99,235,.2); color: #93bbfd; font-weight: 500; }
+.nav-item .icon { font-size: 1.1rem; width: 22px; text-align: center; }
+.nav-item .badge {
+  margin-left: auto;
+  background: var(--accent-red);
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.sidebar-footer .user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.sidebar-footer .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .8rem;
+  font-weight: 700;
+  color: #fff;
+}
+.sidebar-footer .user-name { font-size: .85rem; color: #e2e8f0; }
+.sidebar-footer .user-role { font-size: .72rem; color: #94a3b8; }
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .82rem;
+  color: #94a3b8;
+  padding: 6px 0;
+  transition: color var(--transition);
+}
+.logout-btn:hover { color: #f87171; }
+
+/* 메인 영역 */
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  min-height: 100vh;
+}
+.main-header {
+  height: var(--header-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.main-header .page-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.main-header .header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mobile-menu-btn {
+  display: none;
+  font-size: 1.4rem;
+  color: var(--text);
+  margin-right: 12px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: .85rem;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline {
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+  background: var(--surface);
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.btn-sm { padding: 6px 12px; font-size: .8rem; }
+.btn-ghost { color: var(--text-secondary); padding: 6px 10px; }
+.btn-ghost:hover { background: var(--bg); color: var(--text); }
+
+.main-content { padding: 24px 28px; }
+
+/* ─── 대시보드 ─── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+.stat-card .stat-label {
+  font-size: .78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.stat-card .stat-value {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+}
+.stat-card .stat-sub {
+  font-size: .78rem;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+.stat-card .stat-icon {
+  float: right;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+/* 필터/검색 바 */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 12px;
+  flex: 1;
+  max-width: 320px;
+  transition: border-color var(--transition);
+}
+.search-box:focus-within { border-color: var(--primary); }
+.search-box .icon { color: var(--text-muted); margin-right: 8px; font-size: .9rem; }
+.search-box input {
+  border: none;
+  background: none;
+  padding: 9px 0;
+  font-size: .88rem;
+  flex: 1;
+  outline: none;
+}
+.filter-group {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 3px;
+}
+.filter-btn {
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+}
+.filter-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+.filter-btn:hover:not(.active) { background: var(--bg); }
+
+/* 학생 카드 그리드 */
+.student-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+.student-card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.student-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+.student-card .card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.student-card .student-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.student-card .student-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.student-card .student-meta {
+  font-size: .78rem;
+  color: var(--text-muted);
+}
+.student-card .status-badge {
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 600;
+}
+.status-normal { background: var(--accent-green-bg); color: var(--accent-green); }
+.status-soon { background: var(--accent-orange-bg); color: var(--accent-orange); }
+.status-overdue { background: var(--accent-red-bg); color: var(--accent-red); }
+.status-new { background: var(--accent-purple-bg); color: var(--accent-purple); }
+
+.student-card .card-body { font-size: .84rem; }
+.student-card .info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  color: var(--text-secondary);
+}
+.student-card .info-row .label { color: var(--text-muted); }
+.student-card .info-row .value { font-weight: 500; color: var(--text); }
+.student-card .card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-light);
+}
+.student-card .card-actions .btn { flex: 1; justify-content: center; font-size: .8rem; padding: 7px; }
+
+/* 상담 예정 리스트 */
+.schedule-panel {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.schedule-panel h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.schedule-item:last-child { border-bottom: none; }
+.schedule-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.schedule-item .name { font-weight: 500; font-size: .88rem; }
+.schedule-item .detail { font-size: .8rem; color: var(--text-muted); margin-left: auto; }
+
+/* 대기열 미니 상태 */
+.queue-mini {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.queue-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .82rem;
+}
+.queue-stat .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* ─── 페이지 섹션 (상담/리포트 등) ─── */
+.page-section { display: none; }
+.page-section.active { display: block; }
+
+/* ─── 로딩 ─── */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── 토스트 ─── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  background: var(--text);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  font-size: .85rem;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn .3s ease;
+  max-width: 340px;
+}
+.toast.error { background: var(--accent-red); }
+.toast.success { background: var(--accent-green); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(10px); } }
+
+/* ─── 모달 ─── */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.5);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.active { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 560px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 28px;
+}
+.modal h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.modal .form-group {
+  margin-bottom: 16px;
+}
+.modal .form-group label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+.modal .form-group input,
+.modal .form-group select,
+.modal .form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: .9rem;
+  transition: border-color var(--transition);
+}
+.modal .form-group input:focus,
+.modal .form-group select:focus,
+.modal .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.modal .form-group textarea { resize: vertical; min-height: 80px; }
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+}
+
+/* ─── 빈 상태 ─── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: .92rem; }
+
+/* ─── 모바일 반응형 ─── */
+@media (max-width: 768px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-260px); width: 260px; }
+  .sidebar.open { transform: translateX(0); }
+  .mobile-menu-btn { display: block; }
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 99;
+  }
+  .mobile-overlay.open { display: block; }
+  .main { margin-left: 0; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .student-grid { grid-template-columns: 1fr; }
+  .main-content { padding: 16px; }
+  .main-header { padding: 0 16px; }
+  .login-card { padding: 32px 24px; }
+}
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-card .stat-value { font-size: 1.4rem; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .search-box { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── 로그인 화면 ─── -->
+<div class="login-wrap active" id="loginWrap">
+  <div class="login-card">
+    <div class="logo-area">
+      <div class="logo-icon">🩺</div>
+      <h1>상담 관리 포털</h1>
+      <p class="subtitle">명불허전학원 — 통합 상담 시스템</p>
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-field">
+      <label>이름</label>
+      <input type="text" id="loginUser" placeholder="상담자 이름" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>비밀번호</label>
+      <input type="password" id="loginPass" placeholder="비밀번호 입력">
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="handleLogin()">로그인</button>
+  </div>
+</div>
+
+<!-- ─── 앱 레이아웃 ─── -->
+<div class="app" id="app">
+  <!-- 모바일 오버레이 -->
+  <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+  
+  <!-- 사이드바 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h2>🩺 상담 관리</h2>
+      <span>명불허전학원</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">메인</div>
+      <button class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+        <span class="icon">📊</span> 대시보드
+      </button>
+      <div class="nav-section-label">2주 학생 상담</div>
+      <button class="nav-item" data-page="session" onclick="navigateTo('session')">
+        <span class="icon">🩺</span> 상담 시작
+      </button>
+      <button class="nav-item" data-page="biweekly" onclick="navigateTo('biweekly')">
+        <span class="icon">📄</span> 2주 리포트
+      </button>
+      <div class="nav-section-label">학부모 상담</div>
+      <button class="nav-item" data-page="parent-report" onclick="navigateTo('parent-report')">
+        <span class="icon">📋</span> 학부모 리포트
+      </button>
+      <button class="nav-item" data-page="parent-consult" onclick="navigateTo('parent-consult')">
+        <span class="icon">✏️</span> 상담 기록
+      </button>
+      <div class="nav-section-label">시스템</div>
+      <button class="nav-item" data-page="queue" onclick="navigateTo('queue')">
+        <span class="icon">⚙️</span> 대기열
+        <span class="badge" id="queueBadge" style="display:none">0</span>
+      </button>
+      <button class="nav-item" data-page="urls" onclick="navigateTo('urls')">
+        <span class="icon">🔗</span> URL 관리
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar" id="userAvatar">?</div>
+        <div>
+          <div class="user-name" id="userName">—</div>
+          <div class="user-role" id="userRole">—</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()">
+        ↩ 로그아웃
+      </button>
+    </div>
+  </aside>
+
+  <!-- 메인 -->
+  <div class="main">
+    <header class="main-header">
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="page-title" id="pageTitle">대시보드</div>
+      <div class="header-actions">
+        <button class="btn btn-outline btn-sm" onclick="refreshDashboard()">↻ 새로고침</button>
+        <div class="queue-mini" id="queueMini">
+          <div class="queue-stat"><span class="dot" style="background:var(--accent-orange)"></span> 대기 <b id="qWaiting">0</b></div>
+          <div class="queue-stat"><span class="dot" style="background:var(--primary)"></span> 처리중 <b id="qProcessing">0</b></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <!-- ===== 대시보드 페이지 ===== -->
+      <div class="page-section active" id="page-dashboard">
+        
+        <!-- 통계 카드 -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:var(--primary-light); color:var(--primary)">👥</div>
+            <div class="stat-label">전체 학생</div>
+            <div class="stat-value" id="statTotal">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:var(--accent-green-bg); color:var(--accent-green)">✅</div>
+            <div class="stat-label">상담 완료 (2주 내)</div>
+            <div class="stat-value" id="statNormal">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:var(--accent-orange-bg); color:var(--accent-orange)">⏰</div>
+            <div class="stat-label">상담 예정</div>
+            <div class="stat-value" id="statSoon">—</div>
+            <div class="stat-sub" id="statSoonSub"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:var(--accent-red-bg); color:var(--accent-red)">⚠️</div>
+            <div class="stat-label">상담 지연</div>
+            <div class="stat-value" id="statOverdue">—</div>
+            <div class="stat-sub" id="statOverdueSub"></div>
+          </div>
+        </div>
+
+        <!-- 상담 예정 알림 -->
+        <div class="schedule-panel" id="schedulePanel" style="display:none">
+          <h3>📅 곧 상담이 필요한 학생</h3>
+          <div id="scheduleList"></div>
+        </div>
+
+        <!-- 필터/검색 -->
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="학생 이름 검색..." oninput="filterStudents()">
+          </div>
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">전체</button>
+            <button class="filter-btn" data-filter="overdue" onclick="setFilter('overdue')">지연</button>
+            <button class="filter-btn" data-filter="soon" onclick="setFilter('soon')">예정</button>
+            <button class="filter-btn" data-filter="normal" onclick="setFilter('normal')">정상</button>
+          </div>
+        </div>
+
+        <!-- 학생 카드 그리드 -->
+        <div class="student-grid" id="studentGrid"></div>
+        <div class="empty-state" id="emptyState" style="display:none">
+          <div class="icon">📋</div>
+          <p>표시할 학생이 없습니다.</p>
+        </div>
+      </div>
+
+      <!-- ===== 다른 페이지 (2순위 이후 구현) ===== -->
+      <div class="page-section" id="page-session">
+        <div class="empty-state">
+          <div class="icon">🩺</div>
+          <p>2주 학생 상담 — 다음 단계에서 구현됩니다.</p>
+        </div>
+      </div>
+      <div class="page-section" id="page-biweekly">
+        <div class="empty-state">
+          <div class="icon">📄</div>
+          <p>2주 리포트 관리 — 다음 단계에서 구현됩니다.</p>
+        </div>
+      </div>
+      <div class="page-section" id="page-parent-report">
+        <div class="empty-state">
+          <div class="icon">📋</div>
+          <p>학부모 리포트 관리 — 다음 단계에서 구현됩니다.</p>
+        </div>
+      </div>
+      <div class="page-section" id="page-parent-consult">
+        <div class="empty-state">
+          <div class="icon">✏️</div>
+          <p>학부모 상담 기록 — 다음 단계에서 구현됩니다.</p>
+        </div>
+      </div>
+      <div class="page-section" id="page-queue">
+        <div class="empty-state">
+          <div class="icon">⚙️</div>
+          <p>대기열 관리 — 다음 단계에서 구현됩니다.</p>
+        </div>
+      </div>
+      <div class="page-section" id="page-urls">
+        <div class="empty-state">
+          <div class="icon">🔗</div>
+          <p>URL 관리 — 다음 단계에서 구현됩니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 학생 상세 모달 ─── -->
+<div class="modal-backdrop" id="studentModal">
+  <div class="modal">
+    <h3 id="modalStudentName">학생 상세</h3>
+    <div id="modalContent"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">닫기</button>
+      <button class="btn btn-primary" id="modalStartConsult">🩺 상담 시작</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 토스트 ─── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ─── 로딩 ─── -->
+<div class="loading-overlay" id="loadingOverlay" style="display:none">
+  <div class="loading-spinner"></div>
+</div>
+
+<script>
+// ============================================================
+//  명불허전학원 상담 관리 포털 — 프론트엔드 JS
+// ============================================================
+
+// ─── 설정 ───────────────────────────────────────────────────
+// ⚠️ 아래 URL을 실제 Apps Script 웹앱 URL로 교체하세요
+const API_BASE = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+// ─── 상태 ───────────────────────────────────────────────────
+let state = {
+  token: localStorage.getItem('cp_token') || '',
+  user: localStorage.getItem('cp_user') || '',
+  role: localStorage.getItem('cp_role') || '',
+  students: [],
+  currentFilter: 'all',
+  currentPage: 'dashboard'
+};
+
+// ─── 초기화 ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Enter키 로그인
+  document.getElementById('loginPass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+  document.getElementById('loginUser').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('loginPass').focus();
+  });
+
+  // 저장된 토큰이 있으면 바로 앱 진입
+  if (state.token) {
+    showApp();
+  }
+});
+
+// ─── 인증 ───────────────────────────────────────────────────
+async function handleLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const errEl = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
+
+  if (!user || !pass) {
+    errEl.textContent = '이름과 비밀번호를 입력해주세요.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '로그인 중...';
+  errEl.style.display = 'none';
+
+  try {
+    const res = await apiCall('cp_login', { user, pass }, 'POST');
+    if (res.success) {
+      state.token = res.token;
+      state.user = res.user;
+      state.role = res.role;
+      localStorage.setItem('cp_token', res.token);
+      localStorage.setItem('cp_user', res.user);
+      localStorage.setItem('cp_role', res.role);
+      showApp();
+    } else {
+      errEl.textContent = res.error || '로그인 실패';
+      errEl.style.display = 'block';
+    }
+  } catch (err) {
+    errEl.textContent = '서버 연결 실패: ' + err.message;
+    errEl.style.display = 'block';
+  }
+  
+  btn.disabled = false;
+  btn.textContent = '로그인';
+}
+
+function handleLogout() {
+  state.token = '';
+  state.user = '';
+  state.role = '';
+  localStorage.removeItem('cp_token');
+  localStorage.removeItem('cp_user');
+  localStorage.removeItem('cp_role');
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('loginWrap').classList.add('active');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function showApp() {
+  document.getElementById('loginWrap').classList.remove('active');
+  document.getElementById('app').classList.add('active');
+  document.getElementById('userAvatar').textContent = state.user.charAt(0);
+  document.getElementById('userName').textContent = state.user;
+  document.getElementById('userRole').textContent = state.role === 'admin' ? '관리자' : '상담사';
+  
+  refreshDashboard();
+  loadQueueStatus();
+}
+
+// ─── API 통신 ───────────────────────────────────────────────
+async function apiCall(action, params = {}, method = 'GET') {
+  if (method === 'GET') {
+    const qs = new URLSearchParams({ action, token: state.token, ...params });
+    const resp = await fetch(`${API_BASE}?${qs.toString()}`);
+    return await resp.json();
+  } else {
+    const resp = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // Apps Script CORS
+      body: JSON.stringify({ action, token: state.token, ...params })
+    });
+    return await resp.json();
+  }
+}
+
+// ─── 대시보드 ───────────────────────────────────────────────
+async function refreshDashboard() {
+  showLoading(true);
+  try {
+    const res = await apiCall('cp_dashboard');
+    if (res.success) {
+      state.students = res.students || [];
+      renderDashboardStats();
+      renderStudentCards();
+      renderSchedulePanel();
+    } else {
+      if (res.error && res.error.includes('인증')) {
+        handleLogout();
+        return;
+      }
+      toast(res.error || '데이터 로드 실패', 'error');
+    }
+  } catch (err) {
+    toast('서버 연결 실패', 'error');
+  }
+  showLoading(false);
+}
+
+function getStudentStatus(student) {
+  // [DASHBOARD] 시트의 컬럼 구조에 따라 조정 필요
+  // 여기서는 최근 상담일 기준으로 상태 판별
+  const lastConsultKey = findKey(student, ['최근상담일', '2주상담일', '마지막상담일']);
+  const lastConsult = student[lastConsultKey];
+  
+  if (!lastConsult || lastConsult === '' || lastConsult === '-') {
+    return { status: 'new', label: '신규', daysAgo: null };
+  }
+  
+  const lastDate = new Date(lastConsult);
+  if (isNaN(lastDate.getTime())) {
+    return { status: 'new', label: '신규', daysAgo: null };
+  }
+  
+  const now = new Date();
+  const diffDays = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+  
+  if (diffDays > 16) return { status: 'overdue', label: '지연 (' + diffDays + '일)', daysAgo: diffDays };
+  if (diffDays >= 12) return { status: 'soon', label: diffDays + '일 경과', daysAgo: diffDays };
+  return { status: 'normal', label: '정상', daysAgo: diffDays };
+}
+
+function findKey(obj, candidates) {
+  for (const key of candidates) {
+    for (const objKey of Object.keys(obj)) {
+      if (objKey.includes(key)) return objKey;
+    }
+  }
+  return candidates[0];
+}
+
+function renderDashboardStats() {
+  let total = 0, normal = 0, soon = 0, overdue = 0;
+  
+  state.students.forEach(s => {
+    total++;
+    const st = getStudentStatus(s);
+    if (st.status === 'overdue') overdue++;
+    else if (st.status === 'soon') soon++;
+    else if (st.status === 'normal') normal++;
+    // new도 total에는 포함
+  });
+  
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statNormal').textContent = normal;
+  document.getElementById('statSoon').textContent = soon;
+  document.getElementById('statOverdue').textContent = overdue;
+  
+  if (soon > 0) {
+    document.getElementById('statSoonSub').textContent = '12~16일 경과';
+  }
+  if (overdue > 0) {
+    document.getElementById('statOverdueSub').textContent = '16일 이상 경과';
+  }
+}
+
+function renderSchedulePanel() {
+  const urgentStudents = state.students
+    .map(s => ({ ...s, _status: getStudentStatus(s) }))
+    .filter(s => s._status.status === 'overdue' || s._status.status === 'soon')
+    .sort((a, b) => (b._status.daysAgo || 0) - (a._status.daysAgo || 0));
+  
+  const panel = document.getElementById('schedulePanel');
+  const list = document.getElementById('scheduleList');
+  
+  if (urgentStudents.length === 0) {
+    panel.style.display = 'none';
+    return;
+  }
+  
+  panel.style.display = 'block';
+  list.innerHTML = urgentStudents.slice(0, 8).map(s => {
+    const color = s._status.status === 'overdue' ? 'var(--accent-red)' : 'var(--accent-orange)';
+    const studentName = String(s[Object.keys(s)[0]] || '—');
+    return `
+      <div class="schedule-item">
+        <span class="schedule-dot" style="background:${color}"></span>
+        <span class="name">${esc(studentName)}</span>
+        <span class="detail">${s._status.label}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderStudentCards() {
+  const grid = document.getElementById('studentGrid');
+  const empty = document.getElementById('emptyState');
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  
+  // 색상 팔레트 (아바타)
+  const colors = ['#6366f1','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6'];
+  
+  let filtered = state.students.filter(s => {
+    const name = String(s[Object.keys(s)[0]] || '').toLowerCase();
+    if (search && !name.includes(search)) return false;
+    
+    if (state.currentFilter === 'all') return true;
+    const st = getStudentStatus(s);
+    return st.status === state.currentFilter;
+  });
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  
+  empty.style.display = 'none';
+  
+  grid.innerHTML = filtered.map((s, idx) => {
+    const keys = Object.keys(s).filter(k => !k.startsWith('_'));
+    const name = String(s[keys[0]] || '—');
+    const st = getStudentStatus(s);
+    const color = colors[idx % colors.length];
+    const initial = name.charAt(0);
+    
+    // 주요 정보 추출
+    const parentConsultKey = findKey(s, ['학부모최근상담일', '학부모상담일']);
+    const parentDate = s[parentConsultKey] || '—';
+    const consultCountKey = findKey(s, ['상담회차', '상담횟수']);
+    const consultCount = s[consultCountKey] || '—';
+    
+    let statusClass = 'status-' + st.status;
+    
+    return `
+      <div class="student-card" onclick="openStudentModal('${esc(name)}')">
+        <div class="card-header">
+          <div class="student-avatar" style="background:${color}">${esc(initial)}</div>
+          <div>
+            <div class="student-name">${esc(name)}</div>
+            <div class="student-meta">${st.daysAgo !== null ? st.daysAgo + '일 전 상담' : '상담 기록 없음'}</div>
+          </div>
+          <span class="status-badge ${statusClass}">${esc(st.label)}</span>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">학부모 상담</span>
+            <span class="value">${esc(String(parentDate))}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">상담 회차</span>
+            <span class="value">${esc(String(consultCount))}</span>
+          </div>
+        </div>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-primary btn-sm" onclick="startConsult('${esc(name)}')">🩺 상담</button>
+          <button class="btn btn-outline btn-sm" onclick="viewReports('${esc(name)}')">📄 리포트</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─── 필터 ───────────────────────────────────────────────────
+function setFilter(filter) {
+  state.currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === filter);
+  });
+  renderStudentCards();
+}
+
+function filterStudents() {
+  renderStudentCards();
+}
+
+// ─── 대기열 상태 ────────────────────────────────────────────
+async function loadQueueStatus() {
+  try {
+    const res = await apiCall('cp_queueStatus');
+    if (res.success) {
+      const stats = res.stats;
+      document.getElementById('qWaiting').textContent = stats.waiting;
+      document.getElementById('qProcessing').textContent = stats.processing;
+      
+      const badge = document.getElementById('queueBadge');
+      const pending = stats.waiting + stats.processing;
+      if (pending > 0) {
+        badge.textContent = pending;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  } catch (err) {
+    // 무시
+  }
+}
+
+// ─── 네비게이션 ─────────────────────────────────────────────
+function navigateTo(page) {
+  state.currentPage = page;
+  
+  // 사이드바 활성 항목
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === page);
+  });
+  
+  // 페이지 표시
+  document.querySelectorAll('.page-section').forEach(p => {
+    p.classList.toggle('active', p.id === 'page-' + page);
+  });
+  
+  // 제목
+  const titles = {
+    dashboard: '대시보드',
+    session: '2주 학생 상담',
+    biweekly: '2주 리포트 관리',
+    'parent-report': '학부모 리포트',
+    'parent-consult': '학부모 상담 기록',
+    queue: '대기열 관리',
+    urls: 'URL 관리'
+  };
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+  
+  // 모바일 사이드바 닫기
+  closeSidebar();
+}
+
+// ─── 사이드바 (모바일) ──────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('open');
+}
+
+// ─── 모달 ───────────────────────────────────────────────────
+function openStudentModal(name) {
+  const student = state.students.find(s => String(s[Object.keys(s)[0]]) === name);
+  if (!student) return;
+  
+  document.getElementById('modalStudentName').textContent = name + ' — 상세 정보';
+  
+  const keys = Object.keys(student).filter(k => !k.startsWith('_'));
+  let html = '<div style="font-size:.88rem">';
+  keys.forEach(k => {
+    const val = student[k];
+    if (val === '' || val === null || val === undefined) return;
+    html += `<div class="info-row" style="padding:7px 0; border-bottom:1px solid var(--border-light)">
+      <span class="label">${esc(k)}</span>
+      <span class="value">${esc(String(val))}</span>
+    </div>`;
+  });
+  html += '</div>';
+  
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalStartConsult').onclick = () => {
+    closeModal();
+    startConsult(name);
+  };
+  document.getElementById('studentModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('studentModal').classList.remove('active');
+}
+
+// ─── 액션 ───────────────────────────────────────────────────
+function startConsult(name) {
+  // 2순위 구현에서 상담 세션 페이지로 연결
+  toast(name + ' 상담 시작 — 다음 단계에서 구현됩니다.', 'info');
+  // navigateTo('session');
+}
+
+function viewReports(name) {
+  toast(name + ' 리포트 — 다음 단계에서 구현됩니다.', 'info');
+}
+
+// ─── 유틸리티 ───────────────────────────────────────────────
+function showLoading(show) {
+  document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+}
+
+function toast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type === 'error' ? 'error' : type === 'success' ? 'success' : '');
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+function esc(str) {
+  const el = document.createElement('span');
+  el.textContent = str;
+  return el.innerHTML;
+}
+
+// ESC로 모달 닫기
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
